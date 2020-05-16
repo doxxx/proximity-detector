@@ -9,9 +9,10 @@
 // Uses the RFM69 library by Felix Rusu, LowPowerLab.com
 // Original library: https://www.github.com/lowpowerlab/rfm69
 
+#include <Arduino.h>
 #include "GP2Y0A51SK0F.h"
 #include <RFM69.h>
-#include <LowPower.h>
+//#include <LowPower.h>
 
 // Addresses for this node. CHANGE THESE FOR EACH NODE!
 
@@ -27,40 +28,49 @@
 #define ENCRYPT false                 // Set to "true" to use encryption
 #define ENCRYPTKEY "TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
 
+// Heartbeat LED
+#define HEARTBEAT_LED PC13
+
 // Packet sent/received indicator LED:
-#define PACKET_LED 9
+#define PACKET_LED PA8
 
 // Sensor active indicator LED
-#define ACTIVE_LED 3
+#define ACTIVE_LED PA12
 
 // Proximity sensor data pin
-#define SENSOR_PIN A0
+#define SENSOR_PIN PA0
 
-RFM69 radio;
+// RFM69 radio();
 
 void setup()
 {
   Serial.begin(9600);
-//  Serial.print("Proximity Detector Node #");
-//  Serial.print(MY_NODE_ID, DEC);
-//  Serial.println(" ready");
+  Serial.print("Proximity Detector Node #");
+  Serial.print(MY_NODE_ID, DEC);
+  Serial.println(" ready");
 
   // Set up the indicator LEDs
+  pinMode(HEARTBEAT_LED, OUTPUT);
+  digitalWrite(HEARTBEAT_LED, LOW);
   pinMode(PACKET_LED, OUTPUT);
   digitalWrite(PACKET_LED, LOW);
   pinMode(ACTIVE_LED, OUTPUT);
   digitalWrite(ACTIVE_LED, LOW);
 
+  // Setup sensor
+  pinMode(SENSOR_PIN, INPUT_ANALOG);
+  delay(22); // wait for first stable measurement from sensor
+
   // Initialize the RFM69HCW:
-  radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
-  radio.setHighPower(); // Always use this for RFM69HCW
+  // radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
+  // radio.setHighPower(); // Always use this for RFM69HCW
 
   // Turn on encryption if desired:
-  if (ENCRYPT)
-    radio.encrypt(ENCRYPTKEY);
+  // if (ENCRYPT)
+  //   radio.encrypt(ENCRYPTKEY);
 
-//  Serial.println("RFM initialized");
-  Serial.println("value active");
+  Serial.println("RFM initialized");
+//  Serial.println("value active");
 }
 
 // Message format:
@@ -85,8 +95,8 @@ void checkProximity(bool &active, int &value)
 {
   static auto sensor = ProximitySensor<1>(SENSOR_PIN);
   sensor.sample();
-  value = sensor.getValue();
-  active = value > 150;
+  value = sensor.getDistance();
+  active = value < 5;
 }
 
 void loop()
@@ -99,33 +109,43 @@ void loop()
   bool newActive;
   int value;
 
+  // toggle heartbeat LED
+  digitalWrite(HEARTBEAT_LED, !digitalRead(HEARTBEAT_LED));
+
   checkProximity(newActive, value);
 
-  Serial.print(value);
-  Serial.print(" ");
-  Serial.print(active ? 255 : 0);
-  Serial.println();
+  //  Serial.print(value);
+  //  Serial.print(" ");
+  //  Serial.print(active ? 255 : 0);
+  //  Serial.println();
 
   if (newActive != active) {
     active = newActive;
-    if (active) {
+    Serial.print("active: ");
+    Serial.println(active);
+    if (active)
+    {
       digitalWrite(ACTIVE_LED, HIGH);
-    } else {
+    }
+    else
+    {
       digitalWrite(ACTIVE_LED, LOW);
     }
     messageLen = makeMsg_ProximityStateChange(messageBuffer, active);
     digitalWrite(PACKET_LED, HIGH);
-    radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
+    // TODO: wake up radio
+    // radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
+    // TODO: sleep radio
     digitalWrite(PACKET_LED, LOW);
   }
 
-//  auto now = millis();
-//  if (now < nextTime) {
-//    delay(nextTime - now);
-//  }
+  auto now = millis();
+  if (now < nextTime) {
+    delay(nextTime - now);
+  }
 
-  delay(30);
-  LowPower.idle(SLEEP_1S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, 
-                SPI_OFF, USART0_ON, TWI_OFF);
-  delay(30);
+//  delay(30);
+//  LowPower.idle(SLEEP_1S, ADC_OFF, TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, 
+//                SPI_OFF, USART0_ON, TWI_OFF);
+//  delay(30);
 }

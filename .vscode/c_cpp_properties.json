@@ -1,26 +1,107 @@
 {
     "configurations": [
         {
+            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
+        },
+        {
             "name": "Mac",
+            "macFrameworkPath": [],
             "includePath": [
-                "/Applications/Arduino.app/Contents/Java/tools/**",
-                "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/**",
-                "/Applications/Arduino.app/Contents/Java/hardware/tools/avr/avr/include",
-                "/Users/gordon/Documents/Arduino/libraries/**"
+                "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/include",
+                "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/src",
+                "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/.pio/libdeps/bluepill_f103c8/RFM69_ID92",
+                "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/.pio/libdeps/bluepill_f103c8/SPIFlash_ID125",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/SPI/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/avr",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/LL",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/usb",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/usb/hid",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/usb/cdc",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/STM32F1xx_HAL_Driver/Inc",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/STM32F1xx_HAL_Driver/Src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/STM32F1xx",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Middlewares/ST/STM32_USB_Device_Library/Core/Src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/CMSIS/CMSIS/Core/Include",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/CMSIS/CMSIS/DSP/Include",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/gcc",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/variants/PILL_F103XX",
+                "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/.pio/libdeps/bluepill_f103c8/SharpIR_ID650/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/CMSIS_DSP/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/EEPROM/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/IWatchdog/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Keyboard/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Mouse/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Servo/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/SoftwareSerial/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/SrcWrapper/src",
+                "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Wire/src",
+                "/Users/gordon/.platformio/packages/tool-unity",
+                ""
             ],
-            "forcedInclude": [
-                "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/Arduino.h"
-            ],
-            "macFrameworkPath": [
-                "/System/Library/Frameworks",
-                "/Library/Frameworks"
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/include",
+                    "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/src",
+                    "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/.pio/libdeps/bluepill_f103c8/RFM69_ID92",
+                    "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/.pio/libdeps/bluepill_f103c8/SPIFlash_ID125",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/SPI/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/avr",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/LL",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/usb",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/usb/hid",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino/stm32/usb/cdc",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/STM32F1xx_HAL_Driver/Inc",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/STM32F1xx_HAL_Driver/Src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/STM32F1xx",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Middlewares/ST/STM32_USB_Device_Library/Core/Inc",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Middlewares/ST/STM32_USB_Device_Library/Core/Src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/CMSIS/CMSIS/Core/Include",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/CMSIS/CMSIS/DSP/Include",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/system/Drivers/CMSIS/Device/ST/STM32F1xx/Source/Templates/gcc",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/cores/arduino",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/variants/PILL_F103XX",
+                    "/Users/gordon/Documents/PlatformIO/Projects/200515-194754-bluepill_f103c8/.pio/libdeps/bluepill_f103c8/SharpIR_ID650/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/CMSIS_DSP/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/EEPROM/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/IWatchdog/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Keyboard/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Mouse/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Servo/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/SoftwareSerial/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/SrcWrapper/src",
+                    "/Users/gordon/.platformio/packages/framework-arduinoststm32/libraries/Wire/src",
+                    "/Users/gordon/.platformio/packages/tool-unity",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=40303",
+                "STM32F1",
+                "STM32F103xB",
+                "ARDUINO_BLUEPILL_F103C8",
+                "STM32F1xx",
+                "ARDUINO=10808",
+                "ARDUINO_ARCH_STM32",
+                "ARDUINO_BLUEPILL_F103C8",
+                "BOARD_NAME=\"BLUEPILL_F103C8\"",
+                "HAL_UART_MODULE_ENABLED",
+                ""
             ],
             "intelliSenseMode": "clang-x64",
-            "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
-            "cppStandard": "c++17",
-            "defines": [
-                "__AVR_ATmega328PB__"
+            "cppStandard": "c++14",
+            "compilerPath": "/Users/gordon/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-gcc",
+            "compilerArgs": [
+                "-mcpu=cortex-m3",
+                "-mthumb",
+                ""
             ]
         }
     ],
