@@ -40,7 +40,7 @@
 // Proximity sensor data pin
 #define SENSOR_PIN PA0
 
-// RFM69 radio();
+RFM69 radio(PA4, PA3, true);
 
 void setup()
 {
@@ -62,12 +62,12 @@ void setup()
   delay(22); // wait for first stable measurement from sensor
 
   // Initialize the RFM69HCW:
-  // radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
-  // radio.setHighPower(); // Always use this for RFM69HCW
+  radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
+  radio.setHighPower(); // Always use this for RFM69HCW
 
   // Turn on encryption if desired:
-  // if (ENCRYPT)
-  //   radio.encrypt(ENCRYPTKEY);
+  if (ENCRYPT)
+    radio.encrypt(ENCRYPTKEY);
 
   Serial.println("RFM initialized");
 //  Serial.println("value active");
@@ -134,7 +134,7 @@ void loop()
     messageLen = makeMsg_ProximityStateChange(messageBuffer, active);
     digitalWrite(PACKET_LED, HIGH);
     // TODO: wake up radio
-    // radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
+    radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
     // TODO: sleep radio
     digitalWrite(PACKET_LED, LOW);
   }
