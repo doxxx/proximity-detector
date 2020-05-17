@@ -35,6 +35,7 @@ static double lookupDistance(double volts)
       return f * distance_diff + e.distance;
     }
   }
+  return 0;
 }
 
 template <int Smoothing>
