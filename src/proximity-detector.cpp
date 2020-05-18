@@ -40,6 +40,12 @@
 // Proximity sensor data pin
 #define SENSOR_PIN PA0
 
+// Proximity sensor voltage control pin
+#define SENSOR_VDD_PIN PB9
+
+// Distance (cm) under which the proximity state becomes active
+#define DISTANCE_THRESHOLD 5
+
 RFM69 radio(PA4, PA3, true);
 
 void setup()
@@ -59,7 +65,10 @@ void setup()
 
   // Setup IR sensor pin
   pinMode(SENSOR_PIN, INPUT_ANALOG);
-  delay(22); // allow IR sensor to stabilize
+
+  // Setup the IR VDD pin
+  pinMode(SENSOR_VDD_PIN, OUTPUT);
+  digitalWrite(SENSOR_VDD_PIN, LOW);
 
   // Initialize the RFM69HCW:
   radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
@@ -91,12 +100,14 @@ uint8_t makeMsg_ProximityStateChange(uint8_t *buf, bool active)
   return i;
 }
 
-void checkProximity(bool &active, int &value)
+int checkProximity()
 {
   static auto sensor = ProximitySensor<1>(SENSOR_PIN);
-  sensor.sample();
-  value = sensor.getDistance();
-  active = value < 5;
+  digitalWrite(SENSOR_VDD_PIN, HIGH);   // turn on power to sensor
+  delay(30);                            // wait for sensor measurement to stabilize
+  sensor.sample();                      // sample sensor
+  digitalWrite(SENSOR_VDD_PIN, LOW);    // turn off power to sensor
+  return sensor.getDistance();
 }
 
 void sendProximityStateChange(bool active)
@@ -111,30 +122,30 @@ void sendProximityStateChange(bool active)
   digitalWrite(PACKET_LED, LOW);
 }
 
-void updateProximity()
+void updateProximityState()
 {
   static bool active = false;
 
-  bool newActive;
-  int value;
-
-  checkProximity(newActive, value);
+  int distance = checkProximity();
+  bool newActive = distance < DISTANCE_THRESHOLD;
 
   if (active == newActive) return;
 
     active = newActive;
+
 #if 1
     Serial.print("active: ");
     Serial.println(active);
   digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
 #endif
+
   sendProximityStateChange(active);
 }
 
 void loop()
 {
   digitalWrite(HEARTBEAT_LED, LOW); // turn on heartbeat LED
-  updateProximity();
+  updateProximityState();
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
   LowPower.sleep(1000); // sleep for a second
