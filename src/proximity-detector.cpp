@@ -99,10 +99,20 @@ void checkProximity(bool &active, int &value)
   active = value < 5;
 }
 
+void sendProximityStateChange(bool active)
+{
+  uint8_t messageBuffer[16];
+  uint8_t messageLen = makeMsg_ProximityStateChange(messageBuffer, active);
+  
+  digitalWrite(PACKET_LED, HIGH);
+  radio.receiveDone(); // wake-up radio
+  radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
+  radio.sleep();
+  digitalWrite(PACKET_LED, LOW);
+}
+
 void updateProximity()
 {
-  static uint8_t messageBuffer[16];
-  static uint8_t messageLen;
   static bool active = false;
 
   bool newActive;
@@ -110,25 +120,15 @@ void updateProximity()
 
   checkProximity(newActive, value);
 
-  if (newActive != active) {
+  if (active == newActive) return;
+
     active = newActive;
+#if 1
     Serial.print("active: ");
     Serial.println(active);
-    if (active)
-    {
-      digitalWrite(ACTIVE_LED, HIGH);
-    }
-    else
-    {
-      digitalWrite(ACTIVE_LED, LOW);
-    }
-    messageLen = makeMsg_ProximityStateChange(messageBuffer, active);
-    digitalWrite(PACKET_LED, HIGH);
-    radio.receiveDone(); // wake-up radio
-    radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
-    radio.sleep();
-    digitalWrite(PACKET_LED, LOW);
-  }
+  digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
+#endif
+  sendProximityStateChange(active);
 }
 
 void loop()

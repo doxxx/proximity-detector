@@ -57,13 +57,6 @@ public:
     auto value = analogRead(m_pin);
     auto volts = (value * 3.3) / 1023;
     auto distance = lookupDistance(volts);
-    Serial.print("sensor: value=");
-    Serial.print(value);
-    Serial.print(", volts=");
-    Serial.print(volts, 2);
-    Serial.print(", distance=");
-    Serial.print(distance, 2);
-    Serial.println();
     m_data.add(distance);
   }
 
