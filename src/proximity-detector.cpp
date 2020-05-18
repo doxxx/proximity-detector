@@ -50,10 +50,9 @@ RFM69 radio(PA4, PA3, true);
 
 void setup()
 {
+#ifdef PD_DEBUG
   Serial.begin(9600);
-  // while (!Serial.available()) {}
-
-  delay(1000);
+#endif
 
   // Set up the indicator LEDs
   pinMode(HEARTBEAT_LED, OUTPUT);
@@ -75,9 +74,11 @@ void setup()
   radio.setHighPower();
   if (ENCRYPT) radio.encrypt(ENCRYPTKEY);
 
+#ifdef PD_DEBUG
   Serial.print("RFM initialized with node #");
   Serial.print(MY_NODE_ID, DEC);
   Serial.println();
+#endif
 
   LowPower.begin();
 }
@@ -133,11 +134,11 @@ void updateProximityState()
 
     active = newActive;
 
-#if 1
+#ifdef PD_DEBUG
     Serial.print("active: ");
     Serial.println(active);
-  digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
 #endif
+    digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
 
   sendProximityStateChange(active);
 }
