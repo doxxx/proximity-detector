@@ -40,9 +40,6 @@
 // Proximity sensor data pin
 #define SENSOR_PIN PA0
 
-// Proximity sensor voltage control pin
-#define SENSOR_VDD_PIN PB9
-
 // Distance (cm) under which the proximity state becomes active
 #define DISTANCE_THRESHOLD 5
 
@@ -64,10 +61,6 @@ void setup()
 
   // Setup IR sensor pin
   pinMode(SENSOR_PIN, INPUT_ANALOG);
-
-  // Setup the IR VDD pin
-  pinMode(SENSOR_VDD_PIN, OUTPUT);
-  digitalWrite(SENSOR_VDD_PIN, LOW);
 
   // Initialize the RFM69HCW:
   radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
@@ -104,10 +97,8 @@ uint8_t makeMsg_ProximityStateChange(uint8_t *buf, bool active)
 int checkProximity()
 {
   static auto sensor = ProximitySensor<1>(SENSOR_PIN);
-  digitalWrite(SENSOR_VDD_PIN, HIGH);   // turn on power to sensor
   delay(30);                            // wait for sensor measurement to stabilize
   sensor.sample();                      // sample sensor
-  digitalWrite(SENSOR_VDD_PIN, LOW);    // turn off power to sensor
   return sensor.getDistance();
 }
 
