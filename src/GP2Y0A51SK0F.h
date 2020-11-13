@@ -47,7 +47,7 @@ public:
   {
   }
 
-  int getDistance()
+  double getDistance()
   {
     return m_data.avg();
   }
@@ -62,5 +62,5 @@ public:
 
 private:
   int m_pin;
-  SmoothedValue<int, Smoothing> m_data;
+  SmoothedValue<double, Smoothing> m_data;
 };
