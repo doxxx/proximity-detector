@@ -94,11 +94,14 @@ uint8_t makeMsg_ProximityStateChange(uint8_t *buf, bool active)
   return i;
 }
 
-int checkProximity()
+double checkProximity()
 {
-  static auto sensor = ProximitySensor<1>(SENSOR_PIN);
-  delay(30);                            // wait for sensor measurement to stabilize
-  sensor.sample();                      // sample sensor
+  const int sampleCount = 5;
+  static auto sensor = ProximitySensor<sampleCount>(SENSOR_PIN);
+  for (int i = 0; i < sampleCount; i++) {
+    delay(30);        // wait for next measurement to become available
+    sensor.sample();  // sample sensor
+  }
   return sensor.getDistance();
 }
 
@@ -116,20 +119,30 @@ void sendProximityStateChange(bool active)
 
 void updateProximityState()
 {
-  static bool active = false;
-
-  int distance = checkProximity();
-  bool newActive = distance < DISTANCE_THRESHOLD;
-
-  if (active == newActive) return;
-
-    active = newActive;
+  auto distance = checkProximity();
 
 #ifdef PD_DEBUG
-    Serial.print("active: ");
-    Serial.println(active);
+  Serial.print("distance: ");
+  Serial.println(distance);
+  delay(100); // wait for UART communication to finish
 #endif
-    digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
+
+  bool newActive = distance < DISTANCE_THRESHOLD;
+
+  static bool active = false;
+  if (active == newActive) return;
+
+#ifdef PD_DEBUG
+  Serial.print("active: ");
+  Serial.print(active);
+  Serial.print(" -> ");
+  Serial.println(newActive);
+  delay(100); // wait for UART communication to finish
+#endif
+
+  active = newActive;
+
+  digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
 
   sendProximityStateChange(active);
 }
