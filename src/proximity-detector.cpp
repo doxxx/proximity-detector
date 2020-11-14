@@ -43,6 +43,12 @@
 // Distance (cm) under which the proximity state becomes active
 #define DISTANCE_THRESHOLD 5
 
+// Time in seconds between checks while proximity is active
+#define ACTIVE_CHECK_INTERVAL 60
+
+// Time in seconds between checks while proximity is inactive
+#define INACTIVE_CHECK_INTERVAL 10
+
 RFM69 radio(PA4, PA3, true);
 
 void setup()
@@ -173,14 +179,17 @@ void dumpPacket()
 
 void loop()
 {
-  if (radio.receiveDone()) {
+  if (radio.receiveDone()) { // has a packet been received
 #ifdef PD_DEBUG
     dumpPacket();
 #endif
+
     if (radio.ACKRequested()) radio.sendACK();
+
     auto sig = std::string((const char *)radio.DATA, 3);
     if (sig == "GHT") {
       if (radio.DATA[3] == 0x02) {
+
 #ifdef PD_DEBUG
         Serial.println("command received: proximity check");
         Serial.flush();
@@ -196,10 +205,12 @@ void loop()
   if (active) {
     radio.receiveDone();
 #ifdef PD_DEBUG
-    Serial.println("sleeping for 30 seconds");
+    Serial.printf("sleeping for %d seconds", ACTIVE_CHECK_INTERVAL);
     Serial.flush();
 #endif
-    LowPower.sleep(30000); // sleep for 30 seconds
+    
+    LowPower.sleep(ACTIVE_CHECK_INTERVAL*1000);
+
 #ifdef PD_DEBUG
     Serial.println("wakeup");
     Serial.flush();
@@ -207,10 +218,12 @@ void loop()
   }
   else {
 #ifdef PD_DEBUG
-    Serial.println("sleeping for 1 second");
+    Serial.printf("sleeping for %d second", INACTIVE_CHECK_INTERVAL);
     Serial.flush();
 #endif
-    LowPower.sleep(1000); // sleep for a second
+
+    LowPower.sleep(INACTIVE_CHECK_INTERVAL*1000);
+
 #ifdef PD_DEBUG
     Serial.println("wakeup");
     Serial.flush();
