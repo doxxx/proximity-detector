@@ -203,8 +203,10 @@ void loop()
   auto active = updateProximityState();
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
+  // ensure radio is listening for packets
+  radio.receiveDone();
+
   if (active) {
-    radio.receiveDone();
 #ifdef PD_DEBUG
     Serial.printf("sleeping for %d seconds", ACTIVE_CHECK_INTERVAL);
     Serial.flush();
