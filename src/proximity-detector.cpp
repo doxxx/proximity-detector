@@ -199,6 +199,7 @@ void loop()
   }
 
   digitalWrite(HEARTBEAT_LED, LOW); // turn on heartbeat LED
+  delay(30); // wait for sensor to stabilize
   auto active = updateProximityState();
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
@@ -229,6 +230,4 @@ void loop()
     Serial.flush();
 #endif
   }
-  
-  delay(100); // wait for sensor to stabilize
 }
