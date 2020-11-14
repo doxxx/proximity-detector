@@ -41,7 +41,7 @@
 #define SENSOR_PIN PA0
 
 // Distance (cm) under which the proximity state becomes active
-#define DISTANCE_THRESHOLD 5
+#define DISTANCE_THRESHOLD 6
 
 // Time in seconds between checks while proximity is active
 #define ACTIVE_CHECK_INTERVAL 60
