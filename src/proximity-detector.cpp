@@ -111,33 +111,31 @@ void sendProximityStateChange(bool active)
   uint8_t messageLen = makeMsg_ProximityStateChange(messageBuffer, active);
   
   digitalWrite(PACKET_LED, HIGH);
-  radio.receiveDone(); // wake-up radio
   radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
-  radio.sleep();
   digitalWrite(PACKET_LED, LOW);
 }
 
-void updateProximityState()
+bool updateProximityState()
 {
   auto distance = checkProximity();
 
 #ifdef PD_DEBUG
   Serial.print("distance: ");
   Serial.println(distance);
-  delay(100); // wait for UART communication to finish
+  Serial.flush();
 #endif
 
   bool newActive = distance < DISTANCE_THRESHOLD;
 
   static bool active = false;
-  if (active == newActive) return;
+  if (active == newActive) return active;
 
 #ifdef PD_DEBUG
   Serial.print("active: ");
   Serial.print(active);
   Serial.print(" -> ");
   Serial.println(newActive);
-  delay(100); // wait for UART communication to finish
+  Serial.flush();
 #endif
 
   active = newActive;
@@ -145,15 +143,79 @@ void updateProximityState()
   digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
 
   sendProximityStateChange(active);
+
+  return active;
+}
+
+void dumpPacket()
+{
+  static int packetCount = 0;
+  Serial.print("#[");
+  Serial.print(++packetCount);
+  Serial.print(']');
+  Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
+
+  for (int i = 0; i < radio.DATALEN; i++) {
+    char c = radio.DATA[i];
+    if (isprint(c)) {
+      Serial.print(c);
+    }
+    else {
+      Serial.print('<');
+      Serial.print((int)c);
+      Serial.print('>');
+    }
+  }
+
+  Serial.print("  [RSSI:");Serial.print(radio.RSSI);Serial.print("]");
+  Serial.println();
 }
 
 void loop()
 {
+  if (radio.receiveDone()) {
+#ifdef PD_DEBUG
+    dumpPacket();
+#endif
+    if (radio.ACKRequested()) radio.sendACK();
+    auto sig = std::string((const char *)radio.DATA, 3);
+    if (sig == "GHT") {
+      if (radio.DATA[3] == 0x02) {
+#ifdef PD_DEBUG
+        Serial.println("command received: proximity check");
+        Serial.flush();
+#endif
+      }
+    }
+  }
+
   digitalWrite(HEARTBEAT_LED, LOW); // turn on heartbeat LED
-  updateProximityState();
+  auto active = updateProximityState();
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
-  LowPower.sleep(1000); // sleep for a second
+  if (active) {
+    radio.receiveDone();
+#ifdef PD_DEBUG
+    Serial.println("sleeping for 30 seconds");
+    Serial.flush();
+#endif
+    LowPower.sleep(30000); // sleep for 30 seconds
+#ifdef PD_DEBUG
+    Serial.println("wakeup");
+    Serial.flush();
+#endif
+  }
+  else {
+#ifdef PD_DEBUG
+    Serial.println("sleeping for 1 second");
+    Serial.flush();
+#endif
+    LowPower.sleep(1000); // sleep for a second
+#ifdef PD_DEBUG
+    Serial.println("wakeup");
+    Serial.flush();
+#endif
+  }
   
   delay(100); // wait for sensor to stabilize
 }
