@@ -121,7 +121,7 @@ void sendProximityStateChange(bool active)
   digitalWrite(PACKET_LED, LOW);
 }
 
-bool updateProximityState()
+bool updateProximityState(bool forceUpdate)
 {
   auto distance = checkProximity();
 
@@ -134,22 +134,20 @@ bool updateProximityState()
   bool newActive = distance < DISTANCE_THRESHOLD;
 
   static bool active = false;
-  if (active == newActive) return active;
-
+  if (active != newActive || forceUpdate) {
 #ifdef PD_DEBUG
-  Serial.print("active: ");
-  Serial.print(active);
-  Serial.print(" -> ");
-  Serial.println(newActive);
-  Serial.flush();
+    Serial.print("active: ");
+    Serial.print(active);
+    Serial.print(" -> ");
+    Serial.println(newActive);
+    Serial.flush();
 #endif
 
-  active = newActive;
-
-  digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
-
-  sendProximityStateChange(active);
-
+    active = newActive;
+    digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
+    sendProximityStateChange(active);
+  }
+  
   return active;
 }
 
@@ -179,6 +177,8 @@ void dumpPacket()
 
 void loop()
 {
+  bool forceUpdate = false;
+
   if (radio.receiveDone()) { // has a packet been received
 #ifdef PD_DEBUG
     dumpPacket();
@@ -189,18 +189,18 @@ void loop()
     auto sig = std::string((const char *)radio.DATA, 3);
     if (sig == "GHT") {
       if (radio.DATA[3] == 0x02) {
-
 #ifdef PD_DEBUG
         Serial.println("command received: proximity check");
         Serial.flush();
 #endif
+        forceUpdate = true;
       }
     }
   }
 
   digitalWrite(HEARTBEAT_LED, LOW); // turn on heartbeat LED
   delay(30); // wait for sensor to stabilize
-  auto active = updateProximityState();
+  auto active = updateProximityState(forceUpdate);
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
   // ensure radio is listening for packets
