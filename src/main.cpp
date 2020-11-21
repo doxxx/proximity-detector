@@ -10,7 +10,7 @@
 // Original library: https://www.github.com/lowpowerlab/rfm69
 
 #include "GP2Y0A51SK0F.h"
-#include "STM32Power.h"
+#include "STM32LowPower.h"
 #include <Arduino.h>
 #include <RFM69.h>
 
