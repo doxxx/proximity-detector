@@ -102,6 +102,8 @@ uint8_t makeMsg_ProximityStateChange(uint8_t *buf, bool active)
 
 double checkProximity()
 {
+  using namespace GP2Y0A51SK0F;
+  
   const int sampleCount = 5;
   static auto sensor = ProximitySensor<sampleCount>(SENSOR_PIN);
   for (int i = 0; i < sampleCount; i++) {
