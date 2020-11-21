@@ -10,7 +10,7 @@ double lookupDistance(double volts);
 template <int Smoothing> class ProximitySensor
 {
 public:
-  ProximitySensor(int pin) : m_pin(pin)
+  explicit ProximitySensor(int pin) : m_pin(pin)
   {
   }
 
