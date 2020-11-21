@@ -1,8 +1,10 @@
 #pragma once
 
+#include <algorithm>
+
 template <typename T, int N>
 class SmoothedValue {
-  public:
+ public:
   void add(T v) {
     T old = values[index];
     values[index] = v;
@@ -11,11 +13,12 @@ class SmoothedValue {
     total += v;
     count++;
   }
+
   T avg() {
-    return total / min(N, count);
+    return total / std::min(N, count);
   }
 
-private:
+ private:
   T values[N];
   int index;
   T total;
