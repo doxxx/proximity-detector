@@ -9,10 +9,10 @@
 // Uses the RFM69 library by Felix Rusu, LowPowerLab.com
 // Original library: https://www.github.com/lowpowerlab/rfm69
 
-#include <Arduino.h>
 #include "GP2Y0A51SK0F.h"
-#include <RFM69.h>
 #include "STM32Power.h"
+#include <Arduino.h>
+#include <RFM69.h>
 
 // Addresses for this node. CHANGE THESE FOR EACH NODE!
 
@@ -66,7 +66,9 @@ void setup()
   // Initialize the RFM69HCW:
   radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
   radio.setHighPower();
-  if (ENCRYPT) radio.encrypt(ENCRYPTKEY);
+
+  if (ENCRYPT)
+    radio.encrypt(ENCRYPTKEY);
 
 #ifdef PD_DEBUG
   Serial.print("RFM initialized with node #");
@@ -98,12 +100,13 @@ uint8_t makeMsg_ProximityStateChange(uint8_t *buf, bool active)
 double checkProximity()
 {
   using namespace GP2Y0A51SK0F;
-  
+
   const int sampleCount = 5;
   static auto sensor = ProximitySensor<sampleCount>(SENSOR_PIN);
-  for (int i = 0; i < sampleCount; i++) {
-    delay(30);        // wait for next measurement to become available
-    sensor.sample();  // sample sensor
+  for (int i = 0; i < sampleCount; i++)
+  {
+    delay(30);       // wait for next measurement to become available
+    sensor.sample(); // sample sensor
   }
   return sensor.getDistance();
 }
@@ -112,7 +115,7 @@ void sendProximityStateChange(bool active)
 {
   uint8_t messageBuffer[16];
   uint8_t messageLen = makeMsg_ProximityStateChange(messageBuffer, active);
-  
+
   digitalWrite(PACKET_LED, HIGH);
   radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
   digitalWrite(PACKET_LED, LOW);
@@ -131,7 +134,8 @@ bool updateProximityState(bool forceUpdate)
   bool newActive = distance < DISTANCE_THRESHOLD;
 
   static bool active = false;
-  if (active != newActive || forceUpdate) {
+  if (active != newActive || forceUpdate)
+  {
 #ifdef PD_DEBUG
     Serial.print("active: ");
     Serial.print(active);
@@ -143,7 +147,7 @@ bool updateProximityState(bool forceUpdate)
     active = newActive;
     sendProximityStateChange(active);
   }
-  
+
   return active;
 }
 
@@ -153,21 +157,28 @@ void dumpPacket()
   Serial.print("#[");
   Serial.print(++packetCount);
   Serial.print(']');
-  Serial.print('[');Serial.print(radio.SENDERID, DEC);Serial.print("] ");
+  Serial.print('[');
+  Serial.print(radio.SENDERID, DEC);
+  Serial.print("] ");
 
-  for (int i = 0; i < radio.DATALEN; i++) {
+  for (int i = 0; i < radio.DATALEN; i++)
+  {
     char c = radio.DATA[i];
-    if (isprint(c)) {
+    if (isprint(c))
+    {
       Serial.print(c);
     }
-    else {
+    else
+    {
       Serial.print('<');
       Serial.print((int)c);
       Serial.print('>');
     }
   }
 
-  Serial.print("  [RSSI:");Serial.print(radio.RSSI);Serial.print("]");
+  Serial.print("  [RSSI:");
+  Serial.print(radio.RSSI);
+  Serial.print("]");
   Serial.println();
 }
 
@@ -175,16 +186,20 @@ void loop()
 {
   bool forceUpdate = false;
 
-  if (radio.receiveDone()) { // has a packet been received
+  if (radio.receiveDone()) // has a packet been received
+  {
 #ifdef PD_DEBUG
     dumpPacket();
 #endif
 
-    if (radio.ACKRequested()) radio.sendACK();
+    if (radio.ACKRequested())
+      radio.sendACK();
 
     auto sig = std::string((const char *)radio.DATA, 3);
-    if (sig == "GHT") {
-      if (radio.DATA[3] == 0x02) {
+    if (sig == "GHT")
+    {
+      if (radio.DATA[3] == 0x02)
+      {
 #ifdef PD_DEBUG
         Serial.println("command received: proximity check");
         Serial.flush();
@@ -195,33 +210,35 @@ void loop()
   }
 
   digitalWrite(HEARTBEAT_LED, LOW); // turn on heartbeat LED
-  delay(30); // wait for sensor to stabilize
+  delay(30);                        // wait for sensor to stabilize
   auto active = updateProximityState(forceUpdate);
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
   // ensure radio is listening for packets
   radio.receiveDone();
 
-  if (active) {
+  if (active)
+  {
 #ifdef PD_DEBUG
     Serial.printf("sleeping for %d seconds", ACTIVE_CHECK_INTERVAL);
     Serial.flush();
 #endif
-    
-    LowPower.sleep(ACTIVE_CHECK_INTERVAL*1000);
+
+    LowPower.sleep(ACTIVE_CHECK_INTERVAL * 1000);
 
 #ifdef PD_DEBUG
     Serial.println("wakeup");
     Serial.flush();
 #endif
   }
-  else {
+  else
+  {
 #ifdef PD_DEBUG
     Serial.printf("sleeping for %d second", INACTIVE_CHECK_INTERVAL);
     Serial.flush();
 #endif
 
-    LowPower.sleep(INACTIVE_CHECK_INTERVAL*1000);
+    LowPower.sleep(INACTIVE_CHECK_INTERVAL * 1000);
 
 #ifdef PD_DEBUG
     Serial.println("wakeup");

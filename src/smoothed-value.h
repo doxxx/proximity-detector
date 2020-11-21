@@ -3,9 +3,11 @@
 #include <algorithm>
 
 template <typename T, int N>
-class SmoothedValue {
+class SmoothedValue
+{
  public:
-  void add(T v) {
+  void add(T v)
+  {
     T old = values[index];
     values[index] = v;
     index = (index + 1) % N;
@@ -14,7 +16,8 @@ class SmoothedValue {
     count++;
   }
 
-  T avg() {
+  T avg()
+  {
     return total / std::min(N, count);
   }
 
