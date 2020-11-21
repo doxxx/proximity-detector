@@ -34,9 +34,6 @@
 // Packet sent/received indicator LED:
 #define PACKET_LED PA8
 
-// Sensor active indicator LED
-#define ACTIVE_LED PA12
-
 // Proximity sensor data pin
 #define SENSOR_PIN PA0
 
@@ -62,8 +59,6 @@ void setup()
   digitalWrite(HEARTBEAT_LED, HIGH); // LOW==ON!!!
   pinMode(PACKET_LED, OUTPUT);
   digitalWrite(PACKET_LED, LOW);
-  pinMode(ACTIVE_LED, OUTPUT);
-  digitalWrite(ACTIVE_LED, LOW);
 
   // Setup IR sensor pin
   pinMode(SENSOR_PIN, INPUT_ANALOG);
@@ -146,7 +141,6 @@ bool updateProximityState(bool forceUpdate)
 #endif
 
     active = newActive;
-    digitalWrite(ACTIVE_LED, active ? HIGH : LOW);
     sendProximityStateChange(active);
   }
   
