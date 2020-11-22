@@ -224,7 +224,7 @@ void loop()
     Serial.flush();
 #endif
 
-    LowPower.sleep(ACTIVE_CHECK_INTERVAL * 1000);
+    LowPower.deepSleep(ACTIVE_CHECK_INTERVAL * 1000);
 
 #ifdef PD_DEBUG
     Serial.println("wakeup");
@@ -238,7 +238,7 @@ void loop()
     Serial.flush();
 #endif
 
-    LowPower.sleep(INACTIVE_CHECK_INTERVAL * 1000);
+    LowPower.deepSleep(INACTIVE_CHECK_INTERVAL * 1000);
 
 #ifdef PD_DEBUG
     Serial.println("wakeup");
