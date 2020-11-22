@@ -34,8 +34,11 @@
 // Packet sent/received indicator LED:
 #define PACKET_LED PA8
 
+// Proximity power switch pin
+#define SENSOR_POWER_PIN PB8
+
 // Proximity sensor data pin
-#define SENSOR_PIN PA0
+#define SENSOR_DATA_PIN PA0
 
 // Distance (cm) under which the proximity state becomes active
 #define DISTANCE_THRESHOLD 6
@@ -60,8 +63,12 @@ void setup()
   pinMode(PACKET_LED, OUTPUT);
   digitalWrite(PACKET_LED, LOW);
 
+  // Setup IR power switch pin
+  pinMode(SENSOR_POWER_PIN, OUTPUT);
+  digitalWrite(SENSOR_POWER_PIN, LOW);
+
   // Setup IR sensor pin
-  pinMode(SENSOR_PIN, INPUT_ANALOG);
+  pinMode(SENSOR_DATA_PIN, INPUT_ANALOG);
 
   // Initialize the RFM69HCW:
   radio.initialize(FREQUENCY, MY_NODE_ID, NETWORK_ID);
@@ -102,7 +109,7 @@ double checkProximity()
   using namespace GP2Y0A51SK0F;
 
   const int sampleCount = 5;
-  static auto sensor = ProximitySensor<sampleCount>(SENSOR_PIN);
+  static auto sensor = ProximitySensor<sampleCount>(SENSOR_DATA_PIN);
   for (int i = 0; i < sampleCount; i++)
   {
     delay(30);       // wait for next measurement to become available
@@ -123,7 +130,10 @@ void sendProximityStateChange(bool active)
 
 bool updateProximityState(bool forceUpdate)
 {
+  digitalWrite(SENSOR_POWER_PIN, HIGH); // turn on sensor
+  delay(30);                            // wait for sensor to stabilize
   auto distance = checkProximity();
+  digitalWrite(SENSOR_POWER_PIN, LOW); // turn off sensor
 
 #ifdef PD_DEBUG
   Serial.print("distance: ");
@@ -210,7 +220,7 @@ void loop()
   }
 
   digitalWrite(HEARTBEAT_LED, LOW); // turn on heartbeat LED
-  delay(30);                        // wait for sensor to stabilize
+
   auto active = updateProximityState(forceUpdate);
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
