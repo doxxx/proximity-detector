@@ -131,7 +131,7 @@ void sendProximityStateChange(bool active)
 bool updateProximityState(bool forceUpdate)
 {
   digitalWrite(SENSOR_POWER_PIN, HIGH); // turn on sensor
-  delay(30);                            // wait for sensor to stabilize
+  delay(100);                            // wait for sensor to stabilize
   auto distance = checkProximity();
   digitalWrite(SENSOR_POWER_PIN, LOW); // turn off sensor
 
