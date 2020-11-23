@@ -141,22 +141,8 @@ bool updateProximityState(bool forceUpdate)
   Serial.flush();
 #endif
 
-  bool newActive = distance < DISTANCE_THRESHOLD;
-
-  static bool active = false;
-  if (active != newActive || forceUpdate)
-  {
-#ifdef PD_DEBUG
-    Serial.print("active: ");
-    Serial.print(active);
-    Serial.print(" -> ");
-    Serial.println(newActive);
-    Serial.flush();
-#endif
-
-    active = newActive;
+  bool active = distance < DISTANCE_THRESHOLD;
     sendProximityStateChange(active);
-  }
 
   return active;
 }
