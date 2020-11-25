@@ -2,13 +2,13 @@
 
 ## STM32 Blue Pill to RFM69HCW hookup
 
-* 3.3V -> 12
-* GND -> 1, 6
-* PA3 -> 11
-* PA4 -> 5
-* PA5 -> 4
-* PA6 -> 2
-* PA7 -> 3
+* 3.3V -> 13
+* GND -> 1, 6 (Reset)
+* PA3 -> 14 (DIO0)
+* PA4 -> 5 (NSS)
+* PA5 -> 4 (SCK)
+* PA6 -> 2 (MISO)
+* PA7 -> 3 (MOSI)
 
 ## STM32 Blue Pill to GP2Y0A51SK0F IR Detector
 
