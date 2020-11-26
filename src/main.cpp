@@ -35,7 +35,7 @@
 #define PACKET_LED PA8
 
 // Proximity power switch pin
-#define SENSOR_POWER_PIN PB8
+#define SENSOR_POWER_PIN PA2
 
 // Proximity sensor data pin
 #define SENSOR_DATA_PIN PA0
