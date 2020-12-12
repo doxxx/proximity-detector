@@ -31,9 +31,6 @@
 // Heartbeat LED
 #define HEARTBEAT_LED PC13
 
-// Packet sent/received indicator LED:
-#define PACKET_LED PA8
-
 // Proximity power switch pin
 #define SENSOR_POWER_PIN PA2
 
@@ -41,13 +38,10 @@
 #define SENSOR_DATA_PIN PA0
 
 // Distance (cm) under which the proximity state becomes active
-#define DISTANCE_THRESHOLD 6
+#define DISTANCE_THRESHOLD 8
 
-// Time in seconds between checks while proximity is active
-#define ACTIVE_CHECK_INTERVAL 60
-
-// Time in seconds between checks while proximity is inactive
-#define INACTIVE_CHECK_INTERVAL 10
+// Time in milliseconds between proximity checks
+#define PROXIMITY_CHECK_INTERVAL 5000
 
 RFM69 radio(PA4, PA3, true);
 
@@ -57,11 +51,9 @@ void setup()
   Serial.begin(9600);
 #endif
 
-  // Set up the indicator LEDs
+  // Set up the heartbeat LED
   pinMode(HEARTBEAT_LED, OUTPUT);
   digitalWrite(HEARTBEAT_LED, HIGH); // LOW==ON!!!
-  pinMode(PACKET_LED, OUTPUT);
-  digitalWrite(PACKET_LED, LOW);
 
   // Setup IR power switch pin
   pinMode(SENSOR_POWER_PIN, OUTPUT);
@@ -123,26 +115,28 @@ void sendProximityStateChange(bool active)
   uint8_t messageBuffer[16];
   uint8_t messageLen = makeMsg_ProximityStateChange(messageBuffer, active);
 
-  digitalWrite(PACKET_LED, HIGH);
   radio.sendWithRetry(HUB_NODE_ID, messageBuffer, messageLen);
-  digitalWrite(PACKET_LED, LOW);
 }
 
-bool updateProximityState(bool forceUpdate)
+bool updateProximityState()
 {
   digitalWrite(SENSOR_POWER_PIN, HIGH); // turn on sensor
   delay(100);                            // wait for sensor to stabilize
   auto distance = checkProximity();
   digitalWrite(SENSOR_POWER_PIN, LOW); // turn off sensor
 
+  bool active = distance < DISTANCE_THRESHOLD;
+  
 #ifdef PD_DEBUG
-  Serial.print("distance: ");
-  Serial.println(distance);
+  Serial.print("distance=");
+  Serial.print(distance);
+  Serial.print(", active=");
+  Serial.print(active);
+  Serial.println();
   Serial.flush();
 #endif
 
-  bool active = distance < DISTANCE_THRESHOLD;
-    sendProximityStateChange(active);
+  sendProximityStateChange(active);
 
   return active;
 }
@@ -180,65 +174,24 @@ void dumpPacket()
 
 void loop()
 {
-  bool forceUpdate = false;
-
-  if (radio.receiveDone()) // has a packet been received
-  {
-#ifdef PD_DEBUG
-    dumpPacket();
-#endif
-
-    if (radio.ACKRequested())
-      radio.sendACK();
-
-    auto sig = std::string((const char *)radio.DATA, 3);
-    if (sig == "GHT")
-    {
-      if (radio.DATA[3] == 0x02)
-      {
-#ifdef PD_DEBUG
-        Serial.println("command received: proximity check");
-        Serial.flush();
-#endif
-        forceUpdate = true;
-      }
-    }
-  }
-
   digitalWrite(HEARTBEAT_LED, LOW); // turn on heartbeat LED
 
-  auto active = updateProximityState(forceUpdate);
+#ifdef PD_DEBUG
+    Serial.println("updating proximity state");
+    Serial.flush();
+#endif
+
+  updateProximityState();
+  
+  // ensure radio is asleep
+  radio.sleep();
+
   digitalWrite(HEARTBEAT_LED, HIGH); // turn off heartbeat LED
 
-  // ensure radio is listening for packets
-  radio.receiveDone();
-
-  if (active)
-  {
 #ifdef PD_DEBUG
-    Serial.printf("sleeping for %d seconds", ACTIVE_CHECK_INTERVAL);
+    Serial.println("sleeping");
     Serial.flush();
 #endif
 
-    LowPower.deepSleep(ACTIVE_CHECK_INTERVAL * 1000);
-
-#ifdef PD_DEBUG
-    Serial.println("wakeup");
-    Serial.flush();
-#endif
-  }
-  else
-  {
-#ifdef PD_DEBUG
-    Serial.printf("sleeping for %d second", INACTIVE_CHECK_INTERVAL);
-    Serial.flush();
-#endif
-
-    LowPower.deepSleep(INACTIVE_CHECK_INTERVAL * 1000);
-
-#ifdef PD_DEBUG
-    Serial.println("wakeup");
-    Serial.flush();
-#endif
-  }
+  LowPower.deepSleep(PROXIMITY_CHECK_INTERVAL);
 }
